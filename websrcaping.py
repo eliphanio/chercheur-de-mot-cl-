@@ -40,6 +40,5 @@ print("Mots les plus utiliser :")
 for mot, count in frequence.most_common(10):
     print(f"{mot} : {count} fois")
 
-print("FIN")
-
+print("Términer")
 
