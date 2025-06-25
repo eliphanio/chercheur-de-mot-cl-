@@ -2,43 +2,38 @@ import requests
 from bs4 import BeautifulSoup
 from collections import Counter
 import re
+import csv
+from urllib.parse import urlparse
 
-#url du site à analyser
+# 🔗 URL du site à analyser
+url = "https://exemple.com"
 
-url="https://www.advalorem-solutions.com/"
+# 🌍 Extraire le nom de domaine
+nom_site = urlparse(url).netloc
 
-reponse = requests.get(url)
-soup = BeautifulSoup(reponse.text, "html.parser")
+# 📩 Télécharger la page
+response = requests.get(url)
+soup = BeautifulSoup(response.text, "html.parser")
 
-#enleve tous les balise html
-
+# 🧼 Nettoyage du texte
 text = soup.get_text(separator=' ')
-
-#enleve les caractere sauf lettre et espace
-
 text = re.sub(r'[^a-zA-ZÀ-ÿ\s]', '', text).lower()
-
-#transforme les texte en liste de mot
-
 words = text.split()
 
-#mot à ignorer
+# ❌ Mots à ignorer
+stopwords = ["et", "le", "la", "les", "de", "des", "du", "un", "une", "en", "à", "au", "aux", "pour", "avec", "que", "qui", "dans", "sur", "par", "ce", "ces", "se", "sa", "son", "ou", "mais", "il", "elle", "nous", "vous", "ils", "elles"]
+keywords = [word for word in words if word not in stopwords and len(word) > 2]
 
-mot_ignorer = ["et", "le", "la", "les", "de", "des", "du", "un", "une", "en", "à", "au", "aux", "pour", "avec", "que", "qui", "dans", "sur", "par", "ce", "ces", "se", "sa", "son", "ou", "mais", "il", "elle", "nous", "vous", "ils", "elles"]
+# 🔢 Compter les mots
+frequence = Counter(keywords)
 
-#prend les mots interessent
+# 📝 Écriture dans un fichier CSV
+with open("resultats.csv", mode="w", newline="", encoding="utf-8") as f:
+    writer = csv.writer(f)
+    writer.writerow(["Site", "Mot clé", "Fréquence"])  # entête
 
-mot_interessent = [word for word in words if word not in mot_ignorer and len(word) > 2]
+    for mot, count in frequence.most_common(20):  # top 20 mots
+        writer.writerow([nom_site, mot, count])
 
-#compte les mot les plus utiliser
-
-frequence = Counter(mot_interessent)
-
-#donne les mot les plus utiliser
-
-print("Mots les plus utiliser :")
-for mot, count in frequence.most_common(10):
-    print(f"{mot} : {count} fois")
-
-print("Términer")
+print("✅ Résultats enregistrés dans resultats.csv")
 
