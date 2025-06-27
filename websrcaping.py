@@ -6,7 +6,7 @@ import csv
 from urllib.parse import urlparse
 
 # 🔗 URL du site à analyser
-url = "https://exemple.com"
+url = input("Collez l'url du site web ici: ")
 
 # 🌍 Extraire le nom de domaine
 nom_site = urlparse(url).netloc
